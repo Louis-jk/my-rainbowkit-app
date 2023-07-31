@@ -12,9 +12,9 @@ import {
   zora,
   localhost
 } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { infuraProvider } from 'wagmi/providers/infura';
+import { publicProvider } from 'wagmi/providers/public';
 
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '';
 const INFURA_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '';
@@ -29,9 +29,9 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli, localhost] : []),
   ],
   [
-    publicProvider(),
     alchemyProvider({ apiKey: ALCHEMY_API_KEY }),
-    infuraProvider({ apiKey: INFURA_API_KEY })
+    infuraProvider({ apiKey: INFURA_API_KEY }),
+    publicProvider()
   ]
 );
 
