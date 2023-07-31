@@ -14,8 +14,10 @@ import {
 } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
+import { infuraProvider } from 'wagmi/providers/infura';
 
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '';
+const INFURA_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '';
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
@@ -28,9 +30,8 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
   ],
   [
     publicProvider(),
-    alchemyProvider({
-      apiKey: ALCHEMY_API_KEY
-    })
+    alchemyProvider({ apiKey: ALCHEMY_API_KEY }),
+    infuraProvider({ apiKey: INFURA_API_KEY })
   ]
 );
 
