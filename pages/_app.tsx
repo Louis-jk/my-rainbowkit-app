@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { getDefaultWallets, RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import type { AppProps } from 'next/app';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import {
@@ -13,6 +13,9 @@ import {
   localhost
 } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
+
+const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '';
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
@@ -23,8 +26,17 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
     zora,
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli, localhost] : []),
   ],
-  [publicProvider()]
+  [
+    publicProvider(),
+    alchemyProvider({
+      apiKey: ALCHEMY_API_KEY
+    })
+  ]
 );
+
+const demoAppInfo = {
+  appName: 'Rainbowkit Demo',
+}
 
 const { connectors } = getDefaultWallets({
   appName: 'RainbowKit App',
@@ -42,7 +54,13 @@ const wagmiConfig = createConfig({
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains}>
+      <RainbowKitProvider
+        appInfo={demoAppInfo}
+       chains={chains}
+       theme={darkTheme({
+        borderRadius: 'small',
+      })}
+      >
         <Component {...pageProps} />
       </RainbowKitProvider>
     </WagmiConfig>
