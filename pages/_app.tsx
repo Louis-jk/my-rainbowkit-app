@@ -1,6 +1,10 @@
 import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
-import { getDefaultWallets, RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import {
+  getDefaultWallets,
+  RainbowKitProvider,
+  darkTheme,
+} from '@rainbow-me/rainbowkit';
 import type { AppProps } from 'next/app';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import {
@@ -10,38 +14,42 @@ import {
   optimism,
   polygon,
   zora,
-  localhost
+  localhost,
 } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { infuraProvider } from 'wagmi/providers/infura';
 import { publicProvider } from 'wagmi/providers/public';
 
+const PROJECT_ID = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '';
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '';
-const INFURA_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '';
+const INFURA_API_KEY = process.env.NEXT_PUBLIC_INFURA_API_KEY || '';
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
     mainnet,
+    goerli,
     polygon,
     optimism,
     arbitrum,
     zora,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli, localhost] : []),
+    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true'
+      ? [goerli, localhost]
+      : [goerli]),
   ],
   [
     alchemyProvider({ apiKey: ALCHEMY_API_KEY }),
     infuraProvider({ apiKey: INFURA_API_KEY }),
-    publicProvider()
+    publicProvider(),
   ]
 );
 
 const demoAppInfo = {
   appName: 'Rainbowkit Demo',
-}
+};
 
 const { connectors } = getDefaultWallets({
   appName: 'RainbowKit App',
-  projectId: 'YOUR_PROJECT_ID',
+  projectId: PROJECT_ID,
   chains,
 });
 
@@ -57,10 +65,10 @@ function MyApp({ Component, pageProps }: AppProps) {
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider
         appInfo={demoAppInfo}
-       chains={chains}
-       theme={darkTheme({
-        borderRadius: 'small',
-      })}
+        chains={chains}
+        theme={darkTheme({
+          borderRadius: 'small',
+        })}
       >
         <Component {...pageProps} />
       </RainbowKitProvider>
