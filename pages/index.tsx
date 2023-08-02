@@ -2,7 +2,14 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import { useAccount, useConnect, usePublicClient } from 'wagmi';
+import {
+  useAccount,
+  useBalance,
+  useConnect,
+  useContractReads,
+  usePublicClient,
+  useWalletClient,
+} from 'wagmi';
 import { useIsMounted } from '../hooks/useIsMounted';
 import { useContractRead } from 'wagmi';
 import { abi } from '../artifacts/contracts/abi';
@@ -11,12 +18,8 @@ import { StandardMerkleTree } from '@openzeppelin/merkle-tree';
 import fs from 'fs';
 import merkleTree from '../artifacts/@openzeppelin/merkletree/merkleTree.json';
 import { useCallback, useEffect, useState } from 'react';
-
-const TEST_ADDRESS = '0x06FF5d4540e6bAd851736aD8Dd1e0649Ef54f24a';
-const WAGMI_ADDRESS = '0xeCB504D39723b0be0e3a9Aa33D646642D1051EE1';
-const MERKLE_TREE_TXT =
-  '0xc954c7da4fc7b23ddeea95b739c07b15bc271e6b607bde29cf557f0c45e6f0e9';
-const OTHER_WALLET_ADDRESS = '0x1111111111111111111111111111111111111111';
+import { Layout } from '../components/layout/Layout';
+import { Box, Flex } from '@chakra-ui/react';
 
 type BuyQuantityType = 'increment' | 'decrement';
 
@@ -30,36 +33,103 @@ const Home: NextPage = () => {
     isLoading: connectLoading,
     pendingConnector,
   } = useConnect();
-  const provider = usePublicClient();
+  // const provider = usePublicClient();
   const [possibleQuantity, setPossibleQuantity] = useState<number>(0);
   const [buyQuantity, setBuyQuantity] = useState<number>(0);
 
-  const { data, error, isError, isLoading } = useContractRead({
-    address: TEST_ADDRESS,
-    abi,
-    functionName: 'symbol',
+  const TEST_ADDRESS = '0x06FF5d4540e6bAd851736aD8Dd1e0649Ef54f24a';
+  const WAGMI_ADDRESS = '0xeCB504D39723b0be0e3a9Aa33D646642D1051EE1';
+  const MERKLE_TREE_TXT =
+    '0xc954c7da4fc7b23ddeea95b739c07b15bc271e6b607bde29cf557f0c45e6f0e9';
+  const OTHER_WALLET_ADDRESS = '0x1111111111111111111111111111111111111111';
+
+  // const { data, error, isError, isLoading } = useContractRead({
+  //   address: TEST_ADDRESS,
+  //   abi,
+  //   functionName: 'symbol',
+  // });
+
+  const { data, isError, isLoading } = useBalance({
+    address: address,
   });
 
-  // console.log('====================================');
-  console.log('isLoading?', isLoading);
-  console.log('isError?', isError);
-  isError ? console.error('error?', error) : null;
-  console.log('data?', data);
-  // console.log('====================================');
+  // const { data: walletClient } = useWalletClient();
+  // console.log('walletClient?', walletClient);
 
-  // async function fetchContractGreeting() {
-  //   if (provider) {
-  //     console.log(provider);
-  //     // const contract = new ethers.Contract()
-  //     // try {
+  // const {
+  //   data: balanceOfData,
+  //   error: balanceOfError,
+  //   isError: balanceOfIsError,
+  //   isLoading: balanceOfIsLoading,
+  // } = useContractRead({
+  //   address: TEST_ADDRESS,
+  //   abi,
+  //   functionName: 'balanceOf',
+  //   args: [address ? `${address}` : undefined],
+  // });
 
-  //     // }
-  //   } else {
-  //     {
-  //       console.log('is not exist provider');
-  //     }
+  const erc721Contract = {
+    address: TEST_ADDRESS,
+    abi,
+  };
+
+  const erc721ContractAddress = {
+    ...erc721Contract,
+    args: [address],
+  };
+
+  const contractArr = [
+    {
+      ...erc721Contract,
+      functionName: 'symbol',
+    },
+  ];
+
+  if (address) {
+    contractArr.push({
+      ...erc721ContractAddress,
+      functionName: 'balanceOf',
+    });
+  }
+
+  // const { data, isError, isLoading } = useContractReads({
+  //   contracts: contractArr,
+  //   watch: true,
+  //   onSettled(data) {
+  //     console.log('Settled', data);
+  //   },
+  // });
+
+  console.log('====================================');
+  // console.log('test balanceOfData ??', balanceOfData);
+  console.log('balance data ??', data);
+  console.log('====================================');
+
+  // const getBalanceOfHandler = (payload: any) => {
+  //   const {
+  //     data: balanceOfData,
+  //     error: balanceOfError,
+  //     isError: balanceOfIsError,
+  //     isLoading: balanceOfIsLoading,
+  //   } = useContractRead({
+  //     address: TEST_ADDRESS,
+  //     abi,
+  //     functionName: 'balanceOf',
+  //     args: [address],
+  //   });
+
+  //   console.log('====================================');
+  //   console.log('test balanceOfData ??', balanceOfData);
+  //   console.log('====================================');
+  // };
+
+  // useEffect(() => {
+  //   if (address) {
+  //     getBalanceOfHandler(address);
+
+  //     return () => getBalanceOfHandler(address);
   //   }
-  // }
+  // }, [address]);
 
   const handleBuyQuantity = (type: BuyQuantityType) => {
     console.log('type?', type);
@@ -79,8 +149,6 @@ const Home: NextPage = () => {
         return;
     }
   };
-
-  console.log('buyQuantity ??', buyQuantity);
 
   // Merkle Tree 作成
   // const values = [
@@ -127,24 +195,28 @@ const Home: NextPage = () => {
   console.log('connectors?', connectors);
 
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>RainbowKit App</title>
-        <meta
-          content="Generated by @rainbow-me/create-rainbowkit"
-          name="description"
-        />
-        <link href="/favicon.ico" rel="icon" />
-      </Head>
-
-      <main className={styles.main}>
+    <Layout>
+      <Flex flexDirection="column" justifyContent="center" alignItems="center">
+        <Flex
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          margin={[10, 0, 10, 0]}
+          border={1}
+          borderColor="#666"
+          borderStyle="solid"
+          padding={[10, 10, 10, 10]}
+        >
+          <p>Eternal Crypt - Wizardry BC -</p>
+          <p style={{ fontSize: 20 }}>Adventurer Genesis Collection</p>
+        </Flex>
         {isMounted && isConnected && (
           <div>
             <h1>Connected to {activeConnector?.name}</h1>
           </div>
         )}
 
-        {connectors.map((connector) => (
+        {/* {connectors.map((connector) => (
           <button
             disabled={!connector.ready}
             key={connector.id}
@@ -157,7 +229,7 @@ const Home: NextPage = () => {
           </button>
         ))}
 
-        {error && <div>{error.message}</div>}
+        {error && <div>{error.message}</div>} */}
 
         <ConnectButton />
 
@@ -189,8 +261,8 @@ const Home: NextPage = () => {
             </button>
           </div>
         )}
-      </main>
-    </div>
+      </Flex>
+    </Layout>
   );
 };
 
