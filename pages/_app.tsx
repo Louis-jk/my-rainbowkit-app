@@ -6,6 +6,7 @@ import {
   darkTheme,
 } from '@rainbow-me/rainbowkit';
 import type { AppProps } from 'next/app';
+import { ChakraProvider } from '@chakra-ui/react';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import {
   arbitrum,
@@ -70,7 +71,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           borderRadius: 'small',
         })}
       >
-        <Component {...pageProps} />
+        <ChakraProvider>
+          <Component {...pageProps} />
+        </ChakraProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   );
