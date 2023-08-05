@@ -1,27 +1,48 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import { useCallback, useEffect, useState } from 'react';
 import {
+  mainnet,
   useAccount,
   useBalance,
+  useBlockNumber,
   useConnect,
   useContractReads,
+  useNetwork,
   usePublicClient,
   useWalletClient,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
 } from 'wagmi';
-import { useIsMounted } from '../hooks/useIsMounted';
-import { useContractRead } from 'wagmi';
-import { abi } from '../artifacts/contracts/abi';
-import { wagmiAbi } from '../artifacts/contracts/wagmiAbi';
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree';
-import fs from 'fs';
-import merkleTree from '../artifacts/@openzeppelin/merkletree/merkleTree.json';
-import { useCallback, useEffect, useState } from 'react';
-import { Layout } from '../components/layout/Layout';
-import { Box, Flex } from '@chakra-ui/react';
-
-type BuyQuantityType = 'increment' | 'decrement';
+import Image from 'next/image';
+import { parseEther } from 'viem';
+import { useDispatch } from 'react-redux';
+import { useIsMounted } from '@/hooks/useIsMounted';
+import { goerliTokenAbi } from '@/artifacts/contracts/goerliTokenAbi';
+import { goerliNftAbi } from '@/artifacts/contracts/goerliNftAbi';
+import merkleTree from '@/artifacts/@openzeppelin/merkletree/merkleTree.json';
+import { Layout } from '@/components/layout/Layout';
+import MintButton from '@/components/button/MintButton';
+import * as AllowList from '@/store/modules/AllowListReducer';
+import {
+  NFT_WRITE_CONTRACT_ADDRESS,
+  READ_TEST_CONTRACT_ADDRESS,
+} from '@/constant/sample/contract_address';
+import { ContractString } from '@/interface/contract/contract.interface';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Footer from '@/components/layout/Footer';
+import LocaleModal from '@/components/Modal/LocaleModal';
+import Notice from '@/components/Notice';
+import TopBanner from '@/domain/banners/TopBanner';
+import MiddleBanner from '@/domain/banners/MiddleBanner';
+import InformationBox from '@/domain/information/InformationBox';
+import InformationPriceAndQuantity from '@/domain/information/InformationPriceAndQuantity';
+import PaymentInfo from '@/domain/payment/PaymentInfo';
+import GuideBanner from '@/domain/banners/GuideBanner';
 
 const Home: NextPage = () => {
   const { isMounted } = useIsMounted();
@@ -33,44 +54,20 @@ const Home: NextPage = () => {
     isLoading: connectLoading,
     pendingConnector,
   } = useConnect();
-  // const provider = usePublicClient();
+
+  const dispatch = useDispatch();
+  const { t } = useTranslation('common');
+  const { t: paymentT } = useTranslation('common', { keyPrefix: 'payment' });
+
+  const [isAllowList, setIsAllowList] = useState<boolean>(false);
   const [possibleQuantity, setPossibleQuantity] = useState<number>(0);
   const [buyQuantity, setBuyQuantity] = useState<number>(0);
-
-  const TEST_ADDRESS = '0x06FF5d4540e6bAd851736aD8Dd1e0649Ef54f24a';
-  const WAGMI_ADDRESS = '0xeCB504D39723b0be0e3a9Aa33D646642D1051EE1';
-  const MERKLE_TREE_TXT =
-    '0xc954c7da4fc7b23ddeea95b739c07b15bc271e6b607bde29cf557f0c45e6f0e9';
-  const OTHER_WALLET_ADDRESS = '0x1111111111111111111111111111111111111111';
-
-  // const { data, error, isError, isLoading } = useContractRead({
-  //   address: TEST_ADDRESS,
-  //   abi,
-  //   functionName: 'symbol',
-  // });
-
-  const { data, isError, isLoading } = useBalance({
-    address: address,
-  });
-
-  // const { data: walletClient } = useWalletClient();
-  // console.log('walletClient?', walletClient);
-
-  // const {
-  //   data: balanceOfData,
-  //   error: balanceOfError,
-  //   isError: balanceOfIsError,
-  //   isLoading: balanceOfIsLoading,
-  // } = useContractRead({
-  //   address: TEST_ADDRESS,
-  //   abi,
-  //   functionName: 'balanceOf',
-  //   args: [address ? `${address}` : undefined],
-  // });
+  const [isLocaleModalVisible, setLocaleModalVisible] =
+    useState<boolean>(false);
 
   const erc721Contract = {
-    address: TEST_ADDRESS,
-    abi,
+    address: READ_TEST_CONTRACT_ADDRESS,
+    abi: goerliTokenAbi,
   };
 
   const erc721ContractAddress = {
@@ -92,76 +89,31 @@ const Home: NextPage = () => {
     });
   }
 
-  // const { data, isError, isLoading } = useContractReads({
-  //   contracts: contractArr,
-  //   watch: true,
-  //   onSettled(data) {
-  //     console.log('Settled', data);
-  //   },
-  // });
+  const { data, isError, isLoading } = useContractReads({
+    contracts: contractArr,
+    watch: true,
+    // onSettled(data) {
+    //   console.log('Settled', data);
+    // },
+  });
 
-  console.log('====================================');
-  // console.log('test balanceOfData ??', balanceOfData);
-  console.log('balance data ??', data);
-  console.log('====================================');
+  // write testing config
+  const { config } = usePrepareContractWrite({
+    address: NFT_WRITE_CONTRACT_ADDRESS,
+    abi: goerliNftAbi,
+    functionName: 'mintNFT',
+    account: address,
+    args: [address as ContractString, 'https://google.com'],
+    value: parseEther('0.001'),
+  });
 
-  // const getBalanceOfHandler = (payload: any) => {
-  //   const {
-  //     data: balanceOfData,
-  //     error: balanceOfError,
-  //     isError: balanceOfIsError,
-  //     isLoading: balanceOfIsLoading,
-  //   } = useContractRead({
-  //     address: TEST_ADDRESS,
-  //     abi,
-  //     functionName: 'balanceOf',
-  //     args: [address],
-  //   });
+  const { data: contractWriteData, write } = useContractWrite(config);
 
-  //   console.log('====================================');
-  //   console.log('test balanceOfData ??', balanceOfData);
-  //   console.log('====================================');
-  // };
-
-  // useEffect(() => {
-  //   if (address) {
-  //     getBalanceOfHandler(address);
-
-  //     return () => getBalanceOfHandler(address);
-  //   }
-  // }, [address]);
-
-  const handleBuyQuantity = (type: BuyQuantityType) => {
-    console.log('type?', type);
-
-    switch (type) {
-      case 'increment':
-        if (buyQuantity < possibleQuantity) {
-          setBuyQuantity(buyQuantity + 1);
-        }
-        break;
-      case 'decrement':
-        if (buyQuantity > 0) {
-          setBuyQuantity(buyQuantity - 1);
-        }
-        break;
-      default:
-        return;
-    }
-  };
-
-  // Merkle Tree 作成
-  // const values = [
-  //   ['0xdA19300690e3978fD6aBf56e5A8a58e0453547FB', 10],
-  //   ['0x1111111111111111111111111111111111111111', 20],
-  // ];
-  // const makeTree = StandardMerkleTree.of(values, ['address', 'uint256']);
-  // console.log('Merkle Root:', makeTree.root);
-  // 0xcd9d4700613b40d93b92299c58041134e6f21fcea1948e8faea0cb90e877f0ed
-  // const dump = JSON.stringify(makeTree.dump());
-  // console.log('Merkle Dump:', dump);
-  // {"format":"standard-v1","tree":["0xc954c7da4fc7b23ddeea95b739c07b15bc271e6b607bde29cf557f0c45e6f0e9"],"values":[{"value":["0xdA19300690e3978fD6aBf56e5A8a58e0453547FB",10],"treeIndex":0}],"leafEncoding":["address","uint256"]}
-  // fs.writeFileSync('tree.json', JSON.stringify(tree.dump()));
+  // success state for when the transaction is successful
+  const { isLoading: isTransactionLoading, isSuccess: isTransactionSuccess } =
+    useWaitForTransaction({
+      hash: contractWriteData?.hash,
+    });
 
   // Merkle Tree 検証
   const tree = StandardMerkleTree.load(JSON.parse(JSON.stringify(merkleTree)));
@@ -171,99 +123,65 @@ const Home: NextPage = () => {
   const handleCheckAllowList = () => {
     let member: string = '';
     let quantity: number = 0;
+    let isMember: boolean = false;
 
     for (const [i, v] of tree.entries()) {
       if (v[0] === address) {
         const proof = tree.getProof(i);
-        console.log('member Address', v[0]);
-        console.log('member quantity', v[1]);
-        console.log('Proof:', proof);
 
         member = v[0];
         quantity = v[1];
+        isMember = true;
       }
     }
 
+    setIsAllowList(isMember);
+    dispatch(AllowList.updateAllowListStatus(isMember));
     setPossibleQuantity(quantity);
   };
 
   useEffect(() => {
-    handleCheckAllowList();
-    return () => handleCheckAllowList();
+    if (typeof address !== 'undefined') {
+      handleCheckAllowList();
+      return () => handleCheckAllowList();
+    }
   }, [address]);
 
-  console.log('connectors?', connectors);
-
   return (
-    <Layout>
-      <Flex flexDirection="column" justifyContent="center" alignItems="center">
-        <Flex
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          margin={[10, 0, 10, 0]}
-          border={1}
-          borderColor="#666"
-          borderStyle="solid"
-          padding={[10, 10, 10, 10]}
-        >
-          <p>Eternal Crypt - Wizardry BC -</p>
-          <p style={{ fontSize: 20 }}>Adventurer Genesis Collection</p>
-        </Flex>
-        {isMounted && isConnected && (
-          <div>
-            <h1>Connected to {activeConnector?.name}</h1>
-          </div>
-        )}
-
-        {/* {connectors.map((connector) => (
-          <button
-            disabled={!connector.ready}
-            key={connector.id}
-            onClick={() => connect({ connector })}
-          >
-            {connector.name}
-            {isLoading &&
-              pendingConnector?.id === connector.id &&
-              ' (connecting)'}
-          </button>
-        ))}
-
-        {error && <div>{error.message}</div>} */}
-
-        <ConnectButton />
-
-        {/* {isMounted && address && (
-          <div>
-            <p>{address}</p>
-            <button onClick={fetchContractGreeting}>
-              {address ? 'Fetch Greeting' : 'Please Connect Your Wallet'}
-            </button>
-          </div>
-        )} */}
-
-        {isMounted && address && <p>購入可能数量 {possibleQuantity}個</p>}
-
-        {isMounted && address && (
-          <div className={styles.quantityWap}>
-            <button
-              className={styles.quantityBtn}
-              onClick={() => handleBuyQuantity('decrement')}
-            >
-              -
-            </button>
-            <p>{buyQuantity}</p>
-            <button
-              className={styles.quantityBtn}
-              onClick={() => handleBuyQuantity('increment')}
-            >
-              +
-            </button>
-          </div>
-        )}
-      </Flex>
-    </Layout>
+    <>
+      <Layout>
+        <TopBanner />
+        <MiddleBanner />
+        <InformationBox />
+        <InformationPriceAndQuantity
+          buyQuantity={buyQuantity}
+          possibleQuantity={possibleQuantity}
+          setBuyQuantity={setBuyQuantity}
+        />
+        <PaymentInfo />
+        <Notice type="notice01" />
+        {isMounted && <MintButton type="main" />}
+        <Notice type="notice02" />
+        <GuideBanner />
+        <Footer setLocaleModalVisible={setLocaleModalVisible} />
+      </Layout>
+      {isMounted && (
+        <LocaleModal
+          isVisible={isLocaleModalVisible}
+          setLocaleModalVisible={setLocaleModalVisible}
+        />
+      )}
+    </>
   );
 };
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common', 'footer'])),
+      // Will be passed to the page component as props
+    },
+  };
+}
 
 export default Home;
