@@ -1,0 +1,38 @@
+{
+  "date-info-title": "終了まで",
+  "date-info-time": "dd日 hh時 mm分 ss秒",
+  "quantity-info-title": "残り",
+  "quantity-info-detail": "{{totalQuantity}}個",
+  "notice": "注意事項",
+  "notice01": {
+    "list01": "・ 購入後の返品、交換はできません。",
+    "list02": "・ 購入にはpolygon上で発行されたMATICが必要です。",
+    "list03": "・ Ethereum上で発行されたMATICでは購入できません。"
+  },
+  "notice02": {
+    "list01": "・ ご購入前に、必ず利用解約をご確認ください。",
+    "list02": "・ 購入後の返品、交換はできません。",
+    "list03": "・ 購入にはpolygon上で発行されたMATICが必要です。",
+    "list04": "・ Ethereum上で発行されたMATICでは購入できません。",
+    "list05": "・ 購入にはガス代（手数料）が発生します。",
+    "list06": "・ 購入するタイミングによっては在庫がある場合においても購入できないことがあります。",
+    "list07": "・ hogehoge"
+  },
+  "payment": {
+    "title": "お支払い金額",
+    "matic": "{{price}} MATIC",
+    "sales-price": "1個あたりの販売価格",
+    "limit-quantity": "個数上限(相談必要)",
+    "limit-count": "{{count}} / {{possibleQuantity}}個"
+  },
+  "wallet": {
+    "connect": "ウォレット接続",
+    "mint": "購入する",
+    "minting": "購入中...!",
+    "network-error": "間違ったネットワークです。",
+    "member-only": "登録メンバー専用",
+    "member-only-message": "登録メンバー専用のため、ご購入いただけません。",
+    "mint-success": "NFTを購入しました!",
+    "go-etherscan": "Etherscanへ移動"
+  }
+}

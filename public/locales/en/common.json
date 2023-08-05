@@ -1,0 +1,38 @@
+{
+  "date-info-title": "Until the end time",
+  "date-info-time": "dd day hh hour mm minutes ss second",
+  "quantity-info-title": "Remaining",
+  "quantity-info-detail": "{{totalQuantity}}",
+  "notice": "Notice",
+  "notice01": {
+    "list01": "・ You cannot return or exchange it after purchase.",
+    "list02": "・ In order to purchase, I need the MATIC issued on polygon.",
+    "list03": "・ It cannot be purchased with the MATIC issued on Ethereum."
+  },
+  "notice02": {
+    "list01": "・ Please make sure to check the cancellation before purchasing.",
+    "list02": "・ You cannot return or exchange it after purchase.",
+    "list03": "・ In order to purchase, I need the MATIC issued on polygon.",
+    "list04": "・ It cannot be purchased with the MATIC issued on Ethereum.",
+    "list05": "・ There will be a gas charge (a handling fee) for the purchase.",
+    "list06": "・ Depending on the timing of your purchase, you may not be able to purchase even if you have it in stock.",
+    "list07": "・ hogehoge"
+  },
+  "payment": {
+    "title": "Amount paid",
+    "matic": "{{price}} MATIC",
+    "sales-price": "Selling price per unit",
+    "limit-quantity": "Upper limit of number",
+    "limit-count": "{{count}} / {{possibleQuantity}}"
+  },
+  "wallet": {
+    "connect": "Connect Wallet",
+    "mint": "Mint",
+    "minting": "Minting...!",
+    "network-error": "It's wrong network.",
+    "member-only": "Members Only",
+    "member-only-message": "This is for registered members only and cannot be purchased.",
+    "mint-success": "I purchased NFT!",
+    "go-etherscan": "to Etherscan"
+  }
+}
