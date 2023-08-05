@@ -1,11 +1,19 @@
-This is a [RainbowKit](https://rainbowkit.com) + [wagmi](https://wagmi.sh) + [Next.js](https://nextjs.org/) project bootstrapped with [`create-rainbowkit`](https://github.com/rainbow-me/rainbowkit/tree/main/packages/create-rainbowkit).
-
 ## Getting Started
 
-First, run the development server:
+### Setup
+
+### environment
+
+We also need to set up the local configuration file.
 
 ```bash
-npm run dev
+cp .env.local.example .env.local
+```
+
+### run dev mode
+
+```bash
+yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
