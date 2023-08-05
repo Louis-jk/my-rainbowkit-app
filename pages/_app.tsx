@@ -6,7 +6,7 @@ import {
   darkTheme,
 } from '@rainbow-me/rainbowkit';
 import type { AppProps } from 'next/app';
-import { ChakraProvider } from '@chakra-ui/react';
+import { appWithTranslation } from 'next-i18next';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import {
   arbitrum,
@@ -15,28 +15,19 @@ import {
   optimism,
   polygon,
   zora,
-  localhost,
 } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { infuraProvider } from 'wagmi/providers/infura';
 import { publicProvider } from 'wagmi/providers/public';
+import { wrapper } from '@/store';
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '';
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '';
 const INFURA_API_KEY = process.env.NEXT_PUBLIC_INFURA_API_KEY || '';
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [
-    mainnet,
-    goerli,
-    polygon,
-    optimism,
-    arbitrum,
-    zora,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true'
-      ? [goerli, localhost]
-      : [goerli]),
-  ],
+  // process.env.NODE_ENV === 'product' ?  [polygon] : [goerli],
+  [goerli],
   [
     alchemyProvider({ apiKey: ALCHEMY_API_KEY }),
     infuraProvider({ apiKey: INFURA_API_KEY }),
@@ -55,7 +46,7 @@ const { connectors } = getDefaultWallets({
 });
 
 const wagmiConfig = createConfig({
-  autoConnect: true,
+  autoConnect: false,
   connectors,
   publicClient,
   webSocketPublicClient,
@@ -71,12 +62,10 @@ function MyApp({ Component, pageProps }: AppProps) {
           borderRadius: 'small',
         })}
       >
-        <ChakraProvider>
-          <Component {...pageProps} />
-        </ChakraProvider>
+        <Component {...pageProps} />
       </RainbowKitProvider>
     </WagmiConfig>
   );
 }
 
-export default MyApp;
+export default appWithTranslation(wrapper.withRedux(MyApp));
