@@ -9,6 +9,7 @@ import reducer from './modules';
 const store = wrapMakeStore(() =>
   configureStore({
     reducer,
+    devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().prepend(
         nextReduxCookieMiddleware({
