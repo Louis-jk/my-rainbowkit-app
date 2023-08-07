@@ -8,7 +8,7 @@ const Footer = ({ setLocaleModalVisible }: { setLocaleModalVisible: any }) => {
 
   return (
     <div className="flex flex-col justify-center items-center w-full border-t-2 py-1">
-      <ul className="flex flex-col justify-center items-center mt-5 mb-7">
+      <ul className="flex flex-col justify-center items-center mt-5 mb-7 text-center">
         <li className="my-1">{t('site')}</li>
         <li className="my-1">{t('terms')}</li>
         <li className="my-1">{t('icsct')}</li>
