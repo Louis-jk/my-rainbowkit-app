@@ -9,12 +9,16 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree';
-import merkleTree from '@/artifacts/@openzeppelin/merkletree/merkleTree.json';
-import { goerliNftAbi } from '@/artifacts/contracts/goerliNftAbi';
+import merkleTree from '@/sample/artifacts/@openzeppelin/merkletree/merkleTree.json';
+import { goerliNftAbi } from '@/sample/artifacts/contracts/goerliNftAbi';
 import * as AllowList from '@/store/modules/AllowListReducer';
 import { ContractString } from '@/interface/contract/contract.interface';
-import { NFT_WRITE_CONTRACT_ADDRESS } from '@/constant/sample/contract_address';
+import { NFT_WRITE_CONTRACT_ADDRESS } from '@/constant/sample/contractAddress';
 import { useTranslation } from 'react-i18next';
+import {
+  updateMintLoadingStatus,
+  updateMintSuccessStatus,
+} from '@/store/modules/MintStatusReducer';
 
 type MintButtonType = 'main' | 'top';
 interface MintButtonProps {
@@ -28,6 +32,9 @@ const MintButton = (props: MintButtonProps): JSX.Element => {
   const dispatch = useDispatch();
   const tree = StandardMerkleTree.load(JSON.parse(JSON.stringify(merkleTree)));
   const { t } = useTranslation('common', { keyPrefix: 'wallet' });
+  const { isLoading: isMintLoading, isSuccess: isMintSuccess } = useSelector(
+    (state: any) => state.mintStatus
+  );
 
   // write testing config
   const { config } = usePrepareContractWrite({
@@ -46,6 +53,23 @@ const MintButton = (props: MintButtonProps): JSX.Element => {
     hash: data?.hash,
   });
 
+  const handleMintStatus = () => {
+    if (isLoading) {
+      dispatch(updateMintLoadingStatus(true));
+    }
+
+    if (isSuccess) {
+      dispatch(updateMintSuccessStatus(true));
+    }
+  };
+
+  useEffect(() => {
+    if (isLoading || isSuccess) {
+      handleMintStatus();
+      return () => handleMintStatus();
+    }
+  }, [isLoading, isSuccess]);
+
   const handleCheckAllowList = () => {
     let member: string = '';
     let quantity: number = 0;
@@ -63,7 +87,6 @@ const MintButton = (props: MintButtonProps): JSX.Element => {
 
     dispatch(AllowList.updateAllowListStatus(isMember));
     dispatch(AllowList.updateAllowListMemberQuantity(quantity));
-    // setPossibleQuantity(quantity);
   };
 
   useEffect(() => {
@@ -140,15 +163,15 @@ const MintButton = (props: MintButtonProps): JSX.Element => {
                             ? 'flex flex-row justify-center items-center w-full border border-solid border-black border-1 py-4 mb-10'
                             : 'flex flex-row justify-center items-center min-w-100 outline outline-1 px-10 py-2 bg-slate-900'
                         }
-                        disabled={!write || isLoading}
+                        disabled={!write || isMintLoading}
                         onClick={() => write?.()}
                         type="button"
                         style={{
-                          background: isLoading ? '#e6e6e6' : '#F8CC1B',
+                          background: isMintLoading ? '#e6e6e6' : '#F8CC1B',
                         }}
                       >
                         <p className="text-lg">
-                          {isLoading ? `${t('minting')}` : `${t('mint')}`}
+                          {isMintLoading ? `${t('minting')}` : `${t('mint')}`}
                         </p>
                       </button>
                     );
