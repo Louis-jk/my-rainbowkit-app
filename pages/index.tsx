@@ -43,6 +43,7 @@ import InformationBox from '@/domain/information/InformationBox';
 import InformationPriceAndQuantity from '@/domain/information/InformationPriceAndQuantity';
 import PaymentInfo from '@/domain/payment/PaymentInfo';
 import GuideBanner from '@/domain/banners/GuideBanner';
+import MintStatusModal from '@/components/Modal/MintStatusModal';
 
 const Home: NextPage = () => {
   const { isMounted } = useIsMounted();
@@ -166,10 +167,13 @@ const Home: NextPage = () => {
         <Footer setLocaleModalVisible={setLocaleModalVisible} />
       </Layout>
       {isMounted && (
-        <LocaleModal
-          isVisible={isLocaleModalVisible}
-          setLocaleModalVisible={setLocaleModalVisible}
-        />
+        <>
+          <LocaleModal
+            isVisible={isLocaleModalVisible}
+            setLocaleModalVisible={setLocaleModalVisible}
+          />
+          <MintStatusModal />
+        </>
       )}
     </>
   );
