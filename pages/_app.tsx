@@ -20,14 +20,14 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { infuraProvider } from 'wagmi/providers/infura';
 import { publicProvider } from 'wagmi/providers/public';
 import { wrapper } from '@/store';
-
-const PROJECT_ID = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '';
-const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '';
-const INFURA_API_KEY = process.env.NEXT_PUBLIC_INFURA_API_KEY || '';
+import {
+  ALCHEMY_API_KEY,
+  INFURA_API_KEY,
+  WALLET_CONNECT_PROJECT_ID,
+} from '@/constant/apiKeys';
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  // process.env.NODE_ENV === 'product' ?  [polygon] : [goerli],
-  [goerli],
+  [process.env.NODE_ENV !== 'production' ? goerli : polygon],
   [
     alchemyProvider({ apiKey: ALCHEMY_API_KEY }),
     infuraProvider({ apiKey: INFURA_API_KEY }),
@@ -41,7 +41,7 @@ const demoAppInfo = {
 
 const { connectors } = getDefaultWallets({
   appName: 'RainbowKit App',
-  projectId: PROJECT_ID,
+  projectId: WALLET_CONNECT_PROJECT_ID,
   chains,
 });
 
