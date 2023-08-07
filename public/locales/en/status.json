@@ -1,0 +1,8 @@
+{
+  "mint": {
+    "loading_msg": "Your purchase is being processed.\nPlease wait for a while.\nIf you leave or load the page, you will not be able to report your purchase status on this screen.",
+    "success_msg": "Your purchase has been completed.\nPlease look forward to the reville and pre-release.",
+    "error_msg": "error",
+    "confirm": "Confirm"
+  }
+}
